@@ -1,0 +1,31 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('cont downloading') {
+            steps {
+                git branch: 'main', url: 'https://github.com/nexsonitsolutions/devops.git'
+            }
+        }
+        stage('cont build'){
+            steps{
+                sh 'mvn package'
+            }
+        }
+        stage('cont deploy to test'){
+            steps{
+                deploy adapters: [tomcat9(credentialsId: 'fe753522-2502-4e8a-836b-cde8832fa59c', path: '', url: 'http://172.31.34.104:8080')], contextPath: 'testapp1', war: '**/*.war'
+            }
+        }
+        stage('cont testing'){
+            steps{
+                sh 'echo "test done"'
+            }
+        }
+        stage("cont deploy to prod"){
+            steps{
+                deploy adapters: [tomcat9(credentialsId: 'fe753522-2502-4e8a-836b-cde8832fa59c', path: '', url: 'http://172.31.41.184:8080')], contextPath: 'prodapp1', war: '**/*.war'
+            }
+        }
+    }
+}
